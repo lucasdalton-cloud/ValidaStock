@@ -1,0 +1,134 @@
+### Listar usuarios
+
+GET http://localhost:3000/usuarios
+
+###
+
+### Cadastrar usuario (Gerente)
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+    "nome": "Lucas Patrick",
+    "email": "lucas@validastock.com",
+    "senha": "12345",
+    "perfil": "GERENTE"
+}
+
+###
+
+### Cadastrar usuario (Operador)
+
+POST http://localhost:3000/usuarios
+Content-Type: application/json
+
+{
+    "nome": "Marcos Coelho",
+    "email": "marcos@validastock.com",
+    "senha": "12345",
+    "perfil": "OPERADOR"
+}
+
+###
+
+### Atualizar usuario
+
+PUT http://localhost:3000/usuarios/1
+Content-Type: application/json
+
+{
+    "nome": "Lucas Patrick Dalton",
+    "email": "lucas@validastock.com",
+    "senha": "12345",
+    "perfil": "GERENTE"
+}
+
+###
+
+### Excluir usuario
+
+DELETE http://localhost:3000/usuarios/2
+
+###
+
+### Login
+
+POST http://localhost:3000/login
+Content-Type: application/json
+
+{
+    "email": "lucas@validastock.com",
+    "senha": "12345"
+}
+
+###
+
+### Listar insumos
+
+GET http://localhost:3000/insumos
+
+###
+
+### Buscar insumo por id
+
+GET http://localhost:3000/insumos/1
+
+###
+
+### Cadastrar insumo (lote)
+
+POST http://localhost:3000/insumos
+Content-Type: application/json
+
+{
+    "nome": "Farinha de Trigo",
+    "unidade_medida": "KG",
+    "codigo_lote": "LT-0001",
+    "quantidade_atual": 50,
+    "estoque_minimo": 10,
+    "data_fabricacao": "2026-06-01",
+    "data_validade": "2026-07-05",
+    "usuario_id": 1
+}
+
+###
+
+### Atualizar insumo
+
+PUT http://localhost:3000/insumos/1
+Content-Type: application/json
+
+{
+    "nome": "Farinha de Trigo",
+    "unidade_medida": "KG",
+    "codigo_lote": "LT-0001",
+    "quantidade_atual": 45,
+    "estoque_minimo": 10,
+    "data_fabricacao": "2026-06-01",
+    "data_validade": "2026-07-05",
+    "usuario_id": 1
+}
+
+###
+
+### Excluir insumo
+
+DELETE http://localhost:3000/insumos/1
+
+###
+
+### Registrar saida / consumo de estoque (RF04 + RF06)
+
+POST http://localhost:3000/insumos/1/saida
+Content-Type: application/json
+
+{
+    "quantidade": 5
+}
+
+###
+
+### Painel de alertas: validade critica (<7 dias) ou estoque baixo (RF05)
+
+GET http://localhost:3000/insumos/alertas

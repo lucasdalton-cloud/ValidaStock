@@ -1,0 +1,138 @@
+<h1>ValidaStock - Teste da API</h1>
+
+<h2>Usuarios</h2>
+<button onclick="renderizarUsuarios()">Buscar usuarios</button>
+<br><br>
+<input type="text" id="nome" placeholder="Nome">
+<input type="text" id="email" placeholder="Email">
+<input type="text" id="senha" placeholder="Senha">
+<select id="perfil">
+    <option value="OPERADOR">OPERADOR</option>
+    <option value="GERENTE">GERENTE</option>
+</select>
+<button onclick="cadastrarUsuario()">SALVAR USUARIO</button>
+<div id="listar-usuarios"></div>
+
+<hr>
+
+<h2>Insumos</h2>
+<button onclick="renderizarInsumos()">Buscar insumos</button>
+<button onclick="renderizarAlertas()">Buscar alertas</button>
+<br><br>
+<input type="text" id="insumo-nome" placeholder="Nome do insumo">
+<input type="text" id="unidade" placeholder="Unidade (KG, L, UN)">
+<input type="text" id="lote" placeholder="Codigo do lote">
+<input type="number" id="quantidade" placeholder="Quantidade atual">
+<input type="number" id="estoque-minimo" placeholder="Estoque minimo">
+<input type="date" id="fabricacao">
+<input type="date" id="validade">
+<input type="number" id="usuario-id" placeholder="ID do usuario">
+<button onclick="cadastrarInsumo()">SALVAR INSUMO</button>
+<div id="listar-insumos"></div>
+
+<script>
+    const API = 'http://localhost:3000'
+
+    async function buscarUsuarios() {
+        const resposta = await fetch(`${API}/usuarios`)
+        return resposta.json()
+    }
+
+    async function renderizarUsuarios() {
+        const usuarios = await buscarUsuarios()
+        const div = document.getElementById('listar-usuarios')
+        div.innerHTML = ''
+        usuarios.forEach(usuario => {
+            const card = document.createElement('div')
+            card.style.border = '1px solid #ccc'
+            card.innerHTML = `<b>${usuario.nome}</b> - ${usuario.email} - ${usuario.perfil}`
+            div.appendChild(card)
+        })
+    }
+
+    async function cadastrarUsuario() {
+        const nome = document.getElementById('nome').value
+        const email = document.getElementById('email').value
+        const senha = document.getElementById('senha').value
+        const perfil = document.getElementById('perfil').value
+
+        if (!nome || !email || !senha) {
+            alert('Preencha todas as informacoes!')
+            return
+        }
+
+        const resposta = await fetch(`${API}/usuarios`, {
+            method: 'POST',
+            body: JSON.stringify({ nome, email, senha, perfil }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        const resultado = await resposta.json()
+        alert(resultado.message)
+        renderizarUsuarios()
+    }
+
+    async function buscarInsumos() {
+        const resposta = await fetch(`${API}/insumos`)
+        return resposta.json()
+    }
+
+    function montarCardInsumo(insumo) {
+        const card = document.createElement('div')
+        card.style.border = '1px solid #ccc'
+        card.style.marginBottom = '4px'
+        if (insumo.vencido) card.style.background = '#f8d7da'
+        else if (insumo.validade_critica || insumo.estoque_baixo) card.style.background = '#fff3cd'
+
+        card.innerHTML = `
+            <b>${insumo.nome}</b> (${insumo.unidade_medida}) - lote ${insumo.codigo_lote}<br>
+            Qtd: ${insumo.quantidade_atual} | Minimo: ${insumo.estoque_minimo}<br>
+            Validade: ${insumo.data_validade}
+            ${insumo.vencido ? ' <b>[VENCIDO]</b>' : ''}
+            ${insumo.validade_critica ? ' <b>[VALIDADE CRITICA]</b>' : ''}
+            ${insumo.estoque_baixo ? ' <b>[ESTOQUE BAIXO]</b>' : ''}
+        `
+        return card
+    }
+
+    async function renderizarInsumos() {
+        const insumos = await buscarInsumos()
+        const div = document.getElementById('listar-insumos')
+        div.innerHTML = ''
+        insumos.forEach(insumo => div.appendChild(montarCardInsumo(insumo)))
+    }
+
+    async function renderizarAlertas() {
+        const resposta = await fetch(`${API}/insumos/alertas`)
+        const alertas = await resposta.json()
+        const div = document.getElementById('listar-insumos')
+        div.innerHTML = ''
+        alertas.forEach(insumo => div.appendChild(montarCardInsumo(insumo)))
+    }
+
+    async function cadastrarInsumo() {
+        const nome = document.getElementById('insumo-nome').value
+        const unidade_medida = document.getElementById('unidade').value
+        const codigo_lote = document.getElementById('lote').value
+        const quantidade_atual = document.getElementById('quantidade').value
+        const estoque_minimo = document.getElementById('estoque-minimo').value
+        const data_fabricacao = document.getElementById('fabricacao').value
+        const data_validade = document.getElementById('validade').value
+        const usuario_id = document.getElementById('usuario-id').value
+
+        const resposta = await fetch(`${API}/insumos`, {
+            method: 'POST',
+            body: JSON.stringify({
+                nome, unidade_medida, codigo_lote,
+                quantidade_atual, estoque_minimo,
+                data_fabricacao, data_validade, usuario_id
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        })
+        const resultado = await resposta.json()
+        alert(resultado.message)
+        renderizarInsumos()
+    }
+
+    renderizarUsuarios()
+    renderizarInsumos()
+</script>
